@@ -4,15 +4,25 @@ package com.chen.controllers;
 import com.chen.annotation.NotBlank;
 import com.chen.bean.Bean;
 import com.chen.bean.Chen;
+import com.chen.service.KylinUserService;
 import net.paoding.rose.web.Invocation;
 import net.paoding.rose.web.annotation.Param;
 import net.paoding.rose.web.annotation.Path;
 import net.paoding.rose.web.annotation.rest.Get;
+import net.paoding.rose.web.annotation.rest.Post;
+import net.paoding.rose.web.portal.Pipe;
+import net.paoding.rose.web.portal.Portal;
 import net.paoding.rose.web.var.Flash;
 import net.paoding.rose.web.var.Model;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Arrays;
 
 @Path("/hello/")
 public class HelloController {
+    @Autowired
+    private KylinUserService kylinUserService;
 
     @Get("world")
     public String index(){
@@ -58,4 +68,42 @@ public class HelloController {
         inv.addModel("info",flash.get("msg"));
         return "flash";
     }
+    @Get("/3.7")
+    public String protal(Portal portal){
+        portal.addWindow("p1","/hello/wp1");
+        portal.addWindow("p2","/hello/wp2");
+        return "portal";
+    }
+    @Get("/wp1")
+    public String protal1(){
+        return "@this is p1";
+    }
+    @Get("/wp2")
+    public String portal2(){
+        return "@this is p2";
+    }
+    @Get("/3.8")
+    public String pipe(Pipe pipe){
+        pipe.addWindow("p1", "/hello/wp1");
+        pipe.addWindow("p2", "/hello/wp2");
+        return "pipe";//文档说使用pipe会加速，可是示例实测压根不给响应，一直pending
+    }
+    @Post("/doUpload")
+    public String doUpload(@Param("file")MultipartFile file){
+        return "@upload OK!" + file.getOriginalFilename();
+    }
+    @Post("doUploads")
+    public String doUploads(MultipartFile[] files){
+        String s = "";
+        for (int i = 0; i < files.length; i++) {
+            s += files[i].getOriginalFilename() + "<br>";
+        }
+        return "@ok!" + s;
+    }
+
+    @Get("showUser")
+    public String showUser(){
+        return "@" + kylinUserService.getUser().toString();
+    }
+
 }
