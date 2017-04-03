@@ -24,6 +24,5 @@ public class NotBlankParamValidator implements ParamValidator {
             return "@参数不能为空";
         }
         return null;
-        // 访问时不起作用，启动项目时每个方法调用了一次supports均返回了false，再访问居然不执行了。。。
     }
 }
