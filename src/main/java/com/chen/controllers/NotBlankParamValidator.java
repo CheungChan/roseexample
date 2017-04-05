@@ -13,13 +13,11 @@ public class NotBlankParamValidator implements ParamValidator {
 
     @Override
     public boolean supports(ParamMetaData metaData) {
-        System.out.println("执行了NotBlankParamValidator.supports  method: " + metaData.getMethod());
         return metaData.getAnnotation(NotBlank.class) != null;
     }
 
     @Override
     public Object validate(ParamMetaData metaData, Invocation inv, Object target, Errors errors) {
-        System.out.println("执行了NotBlankParamValidator.validate  method: " + metaData.getMethod());
         if(StringUtils.isBlank(inv.getParameter(metaData.getParamName()))){
             return "@参数不能为空";
         }

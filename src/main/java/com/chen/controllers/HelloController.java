@@ -16,7 +16,11 @@ import net.paoding.rose.web.var.Flash;
 import net.paoding.rose.web.var.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
+import net.coobird.thumbnailator.Thumbnails;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.Arrays;
 
 @Path("/hello/")
@@ -27,6 +31,11 @@ public class HelloController {
     @Get("world")
     public String index(){
         return "@你好世界，这是rose的一个例子";
+    }
+
+    @Get("index")
+    public String indexjsp(){
+        return "index";
     }
     @Get("test")
     public String test(Model model){
@@ -89,7 +98,20 @@ public class HelloController {
         return "pipe";//文档说使用pipe会加速，可是示例实测压根不给响应，一直pending
     }
     @Post("/doUpload")
-    public String doUpload(@Param("file")MultipartFile file){
+    public String doUpload(@Param("file")MultipartFile file) throws IOException{
+        BufferedImage image = ImageIO.read(file.getInputStream());
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        Thumbnails.of(image)
+                .scale(0.5)
+                .outputFormat(file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".") + 1))
+                .toOutputStream(os);
+        byte[] buffer = os.toByteArray();
+        //模拟上传
+        File f = new File(file.getOriginalFilename());
+        PrintStream writer = new PrintStream(f);
+        writer.write(buffer);
+        writer.flush();
+        writer.close();
         return "@upload OK!" + file.getOriginalFilename();
     }
     @Post("doUploads")
